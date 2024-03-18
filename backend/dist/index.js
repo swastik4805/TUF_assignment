@@ -21,9 +21,10 @@ const app = (0, express_1.default)();
 app.use(cors());
 app.use(body_parser_1.default.json());
 app.post("/insertUser", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { username, codeLanguage, stdin } = req.body;
+    const { username, codeLanguage, stdin, sourceCode } = req.body;
+    console.log(req.body);
     try {
-        const insertedUser = yield insertUser(username, codeLanguage, stdin);
+        const insertedUser = yield insertUser(username, codeLanguage, stdin, sourceCode);
         res.json({ success: true, data: insertedUser });
     }
     catch (error) {
@@ -31,13 +32,25 @@ app.post("/insertUser", (req, res) => __awaiter(void 0, void 0, void 0, function
         res.status(500).json({ success: false, error: "error inserting data" });
     }
 }));
-function insertUser(username, codeLanguage, stdin) {
+app.get("/allSubmissions", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    // console.log("hi");
+    try {
+        const submissions = yield prisma.codeEntries.findMany();
+        res.json(submissions);
+    }
+    catch (error) {
+        console.log("error while fetching data");
+        res.status(500).json({ error: "error while fetching data" });
+    }
+}));
+function insertUser(username, codeLanguage, stdin, sourceCode) {
     return __awaiter(this, void 0, void 0, function* () {
         const res = yield prisma.codeEntries.create({
             data: {
                 username,
                 codeLanguage,
-                stdin
+                stdin,
+                sourceCode
             }
         });
         console.log(res);

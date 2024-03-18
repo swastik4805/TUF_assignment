@@ -19,5 +19,6 @@ model codeEntries{
   username String
   codeLanguage String
   stdin String
+  sourceCode String @default("")
   timeStamp DateTime @default(now()) @db.Timestamptz(3)
 }
