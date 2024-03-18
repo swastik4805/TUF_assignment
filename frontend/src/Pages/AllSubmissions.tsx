@@ -1,55 +1,105 @@
-import { useEffect, useState } from "react"
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-export function AllSubmissions(){
-    const [submissions, setSubmissions]=useState([]);
-    useEffect(()=>{
-        fetchSubmissions();
-    },[]);
+export function AllSubmissions() {
+  const [submissions, setSubmissions] = useState([]);
 
-    const fetchSubmissions=async()=>{
-        try{
-            const resposnse=await fetch("http://localhost:3000/allSubmissions");
-            if(resposnse.ok){
-                const data=await resposnse.json();
-                setSubmissions(data);
-            }
-            else{
-                console.log("failed to fetch the data");
-            }
-        }
-        catch(error){
-            console.log("error while fetching data");
-        }
+  useEffect(() => {
+    fetchSubmissions();
+  }, []);
+
+  const fetchSubmissions = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/allSubmissions");
+      if (response.ok) {
+        const data = await response.json();
+        setSubmissions(data);
+      } else {
+        console.log("Failed to fetch the data");
+      }
+    } catch (error) {
+      console.log("Error while fetching data:", error);
     }
+  };
 
+  const handleRunClick = async (submissionId, sourceCode, stdin) => {
+    try {
+      const options = {
+        method: "POST",
+        url: "https://judge0-ce.p.rapidapi.com/submissions",
+        params: {
+          base64_encoded: "true",
+          wait: "true",
+          fields: "*"
+        },
+        headers: {
+          "content-type": "application/json",
+          "Content-Type": "application/json",
+          "X-RapidAPI-Key": "6b8bcb6385mshc8fe593053fea1cp136bdejsne0b7734744bb", // Replace with your RapidAPI key
+          "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+        },
+        data: {
+          language_id: 52,
+          source_code: btoa(sourceCode),
+          stdin: btoa(stdin),
+          expected_output: btoa("Your age is: 18")
+        }
+      };
 
-    return (
-        <div className="p-6">
-          <h2 className="text-xl font-bold mb-4">All Submissions</h2>
-          <div className="overflow-x-auto">
-            <table className="table-auto w-full border-collapse">
-              <thead>
-                <tr>
-                  <th className="px-4 py-2">Username</th>
-                  <th className="px-4 py-2">Stdin</th>
-                  <th className="px-4 py-2">Source Code</th>
-                  <th className="px-4 py-2">Code Language</th>
-                </tr>
-              </thead>
-              <tbody>
-                {submissions.map((submission) => (
-                  <tr key={submission.id}>
-                    <td className="border px-4 py-2">{submission.username}</td>
-                    <td className="border px-4 py-2">{submission.stdin}</td>
-                    <td className="border px-4 py-2">{submission.sourceCode.length>100?submission.sourceCode.substring(1,100)+"...":submission.sourceCode}</td>
-                    <td className="border px-4 py-2">{submission.codeLanguage}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      );
-      
-      
+      const response = await axios.request(options);
+      const updatedSubmissions = submissions.map(submission => {
+        if (submission.id === submissionId) {
+          return { ...submission, status: response.data.status.description };
+        }
+        return submission;
+      });
+      setSubmissions(updatedSubmissions);
+    } catch (error) {
+      console.error("Error while running code:", error);
+    }
+  };
+
+  return (
+    <div className="p-6">
+      <h2 className="text-xl font-bold mb-4">All Submissions</h2>
+      <div className="overflow-x-auto">
+        <table className="table-auto w-full border-collapse">
+          <thead>
+            <tr>
+              <th className="px-4 py-2">Username</th>
+              <th className="px-4 py-2">Stdin</th>
+              <th className="px-4 py-2">Source Code</th>
+              <th className="px-4 py-2">Code Language</th>
+              <th className="px-4 py-2">Time Stamp</th>
+              <th className="px-4 py-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {submissions.map((submission) => (
+              <tr key={submission.id}>
+                <td className="border px-4 py-2">{submission.username}</td>
+                <td className="border px-4 py-2">{submission.stdin}</td>
+                <td className="border px-4 py-2">
+                  {submission.sourceCode.length > 100
+                    ? submission.sourceCode.substring(1, 100) + "..."
+                    : submission.sourceCode}
+                </td>
+                <td className="border px-4 py-2">{submission.codeLanguage}</td>
+                <td className="border px-4 py-2">{submission.timeStamp}</td>
+                <td className="border px-4 py-2">
+                  <div
+                    className="bg-green-400 px-4 py-2 cursor-pointer"
+                    onClick={() => handleRunClick(submission.id, submission.sourceCode, submission.stdin)}
+                  >
+                    Run
+                  </div>
+                  {submission.status && <div>{submission.status}</div>}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
