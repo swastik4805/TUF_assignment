@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 
 export function AllSubmissions() {
   const [submissions, setSubmissions] = useState([]);
+  const [expectedOutput, setExpectedOutput] = useState("");
+  const [submissionId, setSubmissionId] = useState("");
 
   useEffect(() => {
     fetchSubmissions();
@@ -22,7 +24,10 @@ export function AllSubmissions() {
     }
   };
 
-  const handleRunClick = async (submissionId, sourceCode, stdin) => {
+  const handleRunClick = async (submissionId:string, sourceCode:string, stdin:string) => {
+    setSubmissionId(submissionId);
+    const expectedOutput = prompt("Enter Expected Output:") || "";
+    setExpectedOutput(expectedOutput);
     try {
       const options = {
         method: "POST",
@@ -35,14 +40,14 @@ export function AllSubmissions() {
         headers: {
           "content-type": "application/json",
           "Content-Type": "application/json",
-          "X-RapidAPI-Key": "6b8bcb6385mshc8fe593053fea1cp136bdejsne0b7734744bb", // Replace with your RapidAPI key
+          "X-RapidAPI-Key": "6b8bcb6385mshc8fe593053fea1cp136bdejsne0b7734744bb",
           "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
         },
         data: {
           language_id: 52,
           source_code: btoa(sourceCode),
           stdin: btoa(stdin),
-          expected_output: btoa("Your age is: 18")
+          expected_output: btoa(expectedOutput)
         }
       };
 
