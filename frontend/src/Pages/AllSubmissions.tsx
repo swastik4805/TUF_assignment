@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface Submission{
     id: string
@@ -16,7 +17,7 @@ export function AllSubmissions() {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [expectedOutput, setExpectedOutput] = useState("");
   const [submissionId, setSubmissionId] = useState("");
-
+  const navigate=useNavigate();
   useEffect(() => {
     fetchSubmissions();
   }, []);
@@ -88,7 +89,13 @@ export function AllSubmissions() {
 
   return (
     <div className="p-6">
-      <h2 className="text-xl font-bold mb-4">All Submissions</h2>
+      <div className="flex justify-between">
+        <h2 className="text-xl font-bold mb-4">All Submissions</h2>
+        <div className="bg-blue-400 pt-2 rounded-xl px-4 shadow cursor-pointer"
+        onClick={()=>{
+            navigate("/");
+        }}>Submit a code</div>
+      </div>
       <div className="overflow-x-auto">
         <table className="table-auto w-full border-collapse">
           <thead>
