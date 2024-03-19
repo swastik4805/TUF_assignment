@@ -21,19 +21,20 @@ export function Home(){
 
   const handleSubmit= async()=>{
     try{
-        const success=await axios.post("http://localhost:3000/insertUser",{
-            username,
-            codeLanguage,
-            stdin,
-            sourceCode
+        const success=await axios.post("https://tuf-assignment-1.onrender.com/insertUser",{
+        username,
+        codeLanguage,
+        stdin,
+        sourceCode
         })
-        alert("submission successful");
-        return success
+        if(success) alert("submission successful");
+        else if(!success) alert("you forgot to select a language or there is a server problem.")
+        console.log(success);
     }
     catch{
-        alert("you forgot to select a language or there is a server problem.")
-        
-    } 
+        alert("you either forgot to select a language or we have a server problem :(");
+    }
+    
   }
 
   const handleAllSubmissions=()=>{

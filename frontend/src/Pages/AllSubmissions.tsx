@@ -23,7 +23,7 @@ export function AllSubmissions() {
 
   const fetchSubmissions = async () => {
     try {
-      const response = await fetch("http://localhost:3000/allSubmissions");
+      const response = await fetch("https://tuf-assignment-1.onrender.com/allSubmissions");
       if (response.ok) {
         const data = await response.json();
         setSubmissions(data);
@@ -35,39 +35,47 @@ export function AllSubmissions() {
     }
   };
   console.log(submissionId);
+  console.log(expectedOutput);
   const handleRunClick = async (_submissionId:string, sourceCode:string, stdin:string, codeLanguage:string) => {
     setSubmissionId(_submissionId);
     
-    const userInput = prompt("Enter Expected Output:") || "";
-    setExpectedOutput(userInput);
     try {
-      const options = {
-        method: "POST",
-        url: "https://judge0-ce.p.rapidapi.com/submissions",
-        params: {
-          base64_encoded: "true",
-          wait: "true",
-          fields: "*"
-        },
-        headers: {
-          "content-type": "application/json",
-          "Content-Type": "application/json",
-          "X-RapidAPI-Key": "6b8bcb6385mshc8fe593053fea1cp136bdejsne0b7734744bb",
-          "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
-        },
-        data: {
-          language_id: FindLanguage(codeLanguage),
-          source_code: btoa(sourceCode),
-          stdin: btoa(stdin),
-          expected_output: btoa(expectedOutput)
-        }
-      };
+        const userInput:string = await new Promise((resolve) => {
+            const input = prompt("Enter Expected Output:") || "";
+            resolve(input);
+        });
 
-      const response = await axios.request(options);
+        setExpectedOutput(userInput);
+
+        const languageId = await FindLanguage(codeLanguage);
+
+        const options = {
+            method: "POST",
+            url: "https://judge0-ce.p.rapidapi.com/submissions",
+            params: {
+                base64_encoded: "true",
+                wait: "true",
+                fields: "*"
+            },
+            headers: {
+                "content-type": "application/json",
+                "X-RapidAPI-Key": "6b8bcb6385mshc8fe593053fea1cp136bdejsne0b7734744bb",
+                "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
+            },
+            data: {
+                language_id: languageId,
+                source_code: btoa(sourceCode),
+                stdin: btoa(stdin),
+                expected_output: btoa(userInput)
+            }
+        };
+
+        const response = await axios.request(options);
+
         setSubmissions(prevSubmissions => {
             return prevSubmissions.map(submission => {
                 if (submission.id === _submissionId) {
-                return { ...submission, status: response.data.status.description };
+                    return { ...submission, status: response.data.status.description };
                 }
                 return submission;
             });
@@ -75,7 +83,8 @@ export function AllSubmissions() {
     } catch (error) {
         console.error("Error while running code:", error);
     }
-    };
+};
+
 
   return (
     <div className="p-6">
@@ -131,17 +140,17 @@ function FindLanguage(codeLanguage: string){
           "languageId":52
         },{
             "language": "Java",
-            "languageId":27
+            "languageId":62
           },{
             "language": "JavaScript",
             "languageId":63
           },{
             "language": "Python",
-            "languageId":34
+            "languageId":71
           },
           {
             "language": "C",
-            "languageId":50
+            "languageId":48
           }]
 
     for(let i=0;i<obj.length;i++){
