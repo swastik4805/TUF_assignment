@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export function Home(){
     const [codeLanguage, setCodeLanguage] = useState<string | null>(null);
@@ -20,7 +20,7 @@ export function Home(){
 
 
   const handleSubmit= async()=>{
-    const success=await axios.post("http://localhost:3000/insertUser",{
+    const success=await axios.post("https://tuf-assignment-1.onrender.com/insertUser",{
       username,
       codeLanguage,
       stdin,
@@ -34,17 +34,17 @@ export function Home(){
   }
 
   return (
-    <div className='bg-red-100 flex flex-cols-1 justify-center'>
+    <div className='bg-red-100  justify-center'>
       <div className='p-4'>
         <div className="dropdown">
-          <button className="dropdown-toggle bg-blue-200 pb-4 rounded" onClick={() => setIsOpen(!isOpen)}>
+          <button className="dropdown-toggle bg-blue-200 p-2 rounded shadow" onClick={() => setIsOpen(!isOpen)}>
             {codeLanguage || 'Click here to select language'}
           </button>
           {isOpen && (
             <ul className="dropdown-menu">
               {options.map((option, index) => (
                 <li key={index} onClick={() => handleSelect(option)}>
-                  {option}
+                  <div className="bg-green-100 w-24 p-1 cursor-pointer">{option}</div>
                 </li>
               ))}
             </ul>
@@ -55,7 +55,9 @@ export function Home(){
         <br></br> <br></br>
 
         <div className='flex'>
-          Username
+          <div className="pr-3 pt-2">
+            Username
+          </div>
           <textarea placeholder='striver@123' className='pl-2' onChange={(e)=>{
             setUsername(e.target.value);
           }}></textarea>
@@ -64,7 +66,7 @@ export function Home(){
         <br></br> <br></br>
 
         <div>Please paste the stdin here</div>
-        <textarea id="message" rows="4" className="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300" placeholder="your stdin goes here"
+        <textarea id="message" rows={8} className="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300" placeholder="your stdin goes here"
         onChange={(e)=>{
           setStdin(e.target.value);
         }}
@@ -73,7 +75,7 @@ export function Home(){
         <br></br> <br></br>
 
         <div>Please paste the source code here</div>
-        <textarea id="message" rows="4" className="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300" placeholder="your code goes here"
+        <textarea id="message" rows={8} className="block p-3 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300" placeholder="your source code goes here"
         onChange={(e)=>{
           setSourceCode(e.target.value);
         }}
@@ -81,11 +83,14 @@ export function Home(){
       
         <br></br> <br></br>
 
-        <div className='flex justify-center bg-green-300 rounded p-2' onClick={handleSubmit}>Submit</div>
-      
+        <div className="flex">
 
-        <div className='flex justify-center bg-green-300 rounded p-2' onClick={handleAllSubmissions}>All Submissions</div>
-        
+        <div className='flex justify-center bg-green-300 rounded p-2 w-24 shadow cursor-pointer' onClick={handleSubmit}>Submit</div>
+      
+        <div className="pl-4">
+            <div className='flex justify-center bg-blue-300 rounded p-2 w-48 shadow cursor-pointer' onClick={handleAllSubmissions}>All Submissions</div>
+        </div>
+        </div>
       </div>
     </div>
   );

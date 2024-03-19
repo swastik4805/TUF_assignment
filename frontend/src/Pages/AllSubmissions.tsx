@@ -1,8 +1,19 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+interface Submission{
+    id: string
+    username: string
+    sourceCode: string
+    codeLanguage: string
+    timeStamp: Date
+    stdin: string
+    status: string
+}
+
+
 export function AllSubmissions() {
-  const [submissions, setSubmissions] = useState([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [expectedOutput, setExpectedOutput] = useState("");
   const [submissionId, setSubmissionId] = useState("");
 
@@ -12,7 +23,7 @@ export function AllSubmissions() {
 
   const fetchSubmissions = async () => {
     try {
-      const response = await fetch("http://localhost:3000/allSubmissions");
+      const response = await fetch("https://tuf-assignment-1.onrender.com/allSubmissions");
       if (response.ok) {
         const data = await response.json();
         setSubmissions(data);
@@ -24,10 +35,11 @@ export function AllSubmissions() {
     }
   };
 
-  const handleRunClick = async (submissionId:string, sourceCode:string, stdin:string) => {
-    setSubmissionId(submissionId);
-    const expectedOutput = prompt("Enter Expected Output:") || "";
-    setExpectedOutput(expectedOutput);
+  const handleRunClick = async (_submissionId:string, sourceCode:string, stdin:string) => {
+    setSubmissionId(_submissionId);
+    
+    const userInput = prompt("Enter Expected Output:") || "";
+    setExpectedOutput(userInput);
     try {
       const options = {
         method: "POST",
@@ -85,12 +97,12 @@ export function AllSubmissions() {
                 <td className="border px-4 py-2">{submission.username}</td>
                 <td className="border px-4 py-2">{submission.stdin}</td>
                 <td className="border px-4 py-2">
-                  {submission.sourceCode.length > 100
-                    ? submission.sourceCode.substring(1, 100) + "..."
+                  {submission.sourceCode.length > 200
+                    ? submission.sourceCode.substring(1, 200) + "..."
                     : submission.sourceCode}
                 </td>
                 <td className="border px-4 py-2">{submission.codeLanguage}</td>
-                <td className="border px-4 py-2">{submission.timeStamp}</td>
+                <td className="border px-4 py-2">{submission.timeStamp.toLocaleString()}</td>
                 <td className="border px-4 py-2">
                   <div
                     className="bg-green-400 px-4 py-2 cursor-pointer"
