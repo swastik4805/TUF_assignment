@@ -60,7 +60,7 @@ export function AllSubmissions() {
             },
             headers: {
                 "content-type": "application/json",
-                "X-RapidAPI-Key": "6b8bcb6385mshc8fe593053fea1cp136bdejsne0b7734744bb",
+                "X-RapidAPI-Key": "647e4d46e5msh2304825579e74c9p17fcc4jsna6c6b6b972c0",
                 "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
             },
             data: {
