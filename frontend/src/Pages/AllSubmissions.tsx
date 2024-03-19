@@ -23,7 +23,7 @@ export function AllSubmissions() {
 
   const fetchSubmissions = async () => {
     try {
-      const response = await fetch("https://tuf-assignment-1.onrender.com/allSubmissions");
+      const response = await fetch("http://localhost:3000/allSubmissions");
       if (response.ok) {
         const data = await response.json();
         setSubmissions(data);
@@ -34,8 +34,8 @@ export function AllSubmissions() {
       console.log("Error while fetching data:", error);
     }
   };
-
-  const handleRunClick = async (_submissionId:string, sourceCode:string, stdin:string) => {
+  console.log(submissionId);
+  const handleRunClick = async (_submissionId:string, sourceCode:string, stdin:string, codeLanguage:string) => {
     setSubmissionId(_submissionId);
     
     const userInput = prompt("Enter Expected Output:") || "";
@@ -56,7 +56,7 @@ export function AllSubmissions() {
           "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com"
         },
         data: {
-          language_id: 52,
+          language_id: FindLanguage(codeLanguage),
           source_code: btoa(sourceCode),
           stdin: btoa(stdin),
           expected_output: btoa(expectedOutput)
@@ -64,17 +64,18 @@ export function AllSubmissions() {
       };
 
       const response = await axios.request(options);
-      const updatedSubmissions = submissions.map(submission => {
-        if (submission.id === submissionId) {
-          return { ...submission, status: response.data.status.description };
-        }
-        return submission;
-      });
-      setSubmissions(updatedSubmissions);
+        setSubmissions(prevSubmissions => {
+            return prevSubmissions.map(submission => {
+                if (submission.id === _submissionId) {
+                return { ...submission, status: response.data.status.description };
+                }
+                return submission;
+            });
+        });
     } catch (error) {
-      console.error("Error while running code:", error);
+        console.error("Error while running code:", error);
     }
-  };
+    };
 
   return (
     <div className="p-6">
@@ -106,7 +107,7 @@ export function AllSubmissions() {
                 <td className="border px-4 py-2">
                   <div
                     className="bg-green-400 px-4 py-2 cursor-pointer"
-                    onClick={() => handleRunClick(submission.id, submission.sourceCode, submission.stdin)}
+                    onClick={() => handleRunClick(submission.id, submission.sourceCode, submission.stdin, submission.codeLanguage)}
                   >
                     Run
                   </div>
@@ -119,4 +120,35 @@ export function AllSubmissions() {
       </div>
     </div>
   );
+}
+
+
+
+function FindLanguage(codeLanguage: string){
+    const obj=[
+        {
+          "language": "C++",
+          "languageId":52
+        },{
+            "language": "Java",
+            "languageId":27
+          },{
+            "language": "JavaScript",
+            "languageId":63
+          },{
+            "language": "Python",
+            "languageId":34
+          },
+          {
+            "language": "C",
+            "languageId":50
+          }]
+
+    for(let i=0;i<obj.length;i++){
+        if(obj[i].language===codeLanguage){
+            console.log(obj[i].languageId);
+            return obj[i].languageId;
+        }
+    }
+    return 52;
 }
